@@ -1,5 +1,6 @@
 %{
 	#include "grammar.tab.h"
+	#include "../src/list.h"
 
 	#include <stdio.h>
 	#include <string.h>
@@ -9,6 +10,10 @@
 	void makeTabs(char *tabs, int depth);
 
 	extern int indent_depth;
+
+	List *varList;
+	List *inVarList;
+	List *finalVarList;
 %}
 
 %union {
@@ -30,21 +35,63 @@
 
 program:
 	TK_ENTRADA varlist nl TK_SAIDA TK_ID nl cmds_opt TK_FIM nl {
+
+		finalVarList = LIST_create();
+
+		int flag = 0;
+		for (int i = 0; i < LIST_len(varList); i++) {
+			for (int j = 0; j < LIST_len(inVarList); j++) {
+				if (LIST_get(inVarList, i) != NULL) {
+					if (!strcmp(LIST_get(varList, i), LIST_get(inVarList, i))) {
+						free(LIST_get(inVarList, i));
+						LIST_set(inVarList, i, NULL);
+						flag = 1;
+						break;
+					}
+				}
+			}
+			if (!flag) {
+				finalVarList = LIST_push(finalVarList, LIST_get(varList, i));
+			}
+			flag = 0;
+		}
+
+
+
 		printf(
 			"unsigned int func(%s) {\n"
+			"\tunsigned int "
+			, $2
+		);
+
+		for (int i = 0; i < LIST_len(finalVarList) - 1; i++) {
+			printf("%s, ", (char *) LIST_get(finalVarList, i) );
+		}
+		printf("%s;\n", (char *) LIST_get(finalVarList, LIST_len(finalVarList) - 1) );
+
+		printf(
 			"%s\n"
 			"\treturn %s;\n"
 			"}\n"
-			, $2, $7, $5
+			, $7, $5
 		);
 
+		for (int i = 0; i < LIST_len(finalVarList); i++) {
+			free(LIST_get(finalVarList, i));
+		}
+		free(finalVarList);
+
 		free($2);
+		free($5);
+		free($7);
 	}
 ;
 
 varlist:
 	varlist ',' TK_ID {
 		char sep[] = ", unsigned int ";
+
+		inVarList = LIST_push(inVarList, strdup($3));
 		
 		size_t len =
 			strlen($1) +
@@ -64,6 +111,8 @@ varlist:
 	}
 	| TK_ID {
 		char type[] = "unsigned int ";
+
+		inVarList = LIST_push(inVarList, strdup($1));
 
 		size_t len =
 			sizeof(type) +
@@ -236,8 +285,14 @@ nl:
 #include <stdio.h>
 
 int main() {
+	varList = LIST_create();
+	inVarList = LIST_create();
+
 	yyparse();
-	
+
+	LIST_delete(varList);
+	LIST_delete(inVarList);
+
 	return 0;
 }
 

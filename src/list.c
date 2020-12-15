@@ -5,32 +5,49 @@
 
 struct list {
 	int len;
-	int capacity;
+	int cap;
 	void *data[];
 };
 
 List *LIST_create() {
-	List *s = malloc(sizeof(struct list) + sizeof(void *) * INIT_CAPACITY);
+	List *l = malloc(sizeof(struct list) + sizeof(void *) * LIST_INIT_CAPACITY);
 
-	s->len = 0;
-	s->capacity = LIST_INIT_CAPACITY;
+	l->len = 0;
+	l->cap = LIST_INIT_CAPACITY;
 
-	return s;
+	return l;
 }
 
-List *LIST_push(List *s, void* val) {
-	if (s->len == s->capacity) {
-		s->capacity <<= 1;
-		s = realloc(s, sizeof(struct list) + sizeof(void *) * s->capacity);
+List *LIST_push(List *l, void* val) {
+	if (l->len == l->cap) {
+		l->cap <<= 1;
+		l = realloc(l, sizeof(struct list) + sizeof(void *) * l->cap);
 	}
 
-	s->data[s->len++] = val;
+	l->data[l->len++] = val;
 
-	return s;
+	return l;
 }
 
-void *LIST_pop(List *s) {
-	return s->data[--s->len];
+void *LIST_pop(List *l) {
+	return l->data[--l->len];
 }
 
-int LIST_len(List *s) { return s->len; };
+void *LIST_get(List *l, unsigned int i) {
+	if (i < l->len) {
+		return l->data[i];
+	}
+	return NULL;
+}
+
+void LIST_set(List *l, unsigned int i, void *val) {
+	if (i < l->len) {
+		l->data[i] = val;
+	}
+}
+
+void LIST_delete(List *l) {
+	free(l);
+}
+
+int LIST_len(List *l) { return l->len; };

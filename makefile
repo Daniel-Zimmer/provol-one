@@ -1,13 +1,22 @@
-build: bin/provol-comp
+build: bin bin/provol-comp
 
 clean:
-	rm -f bin/*
+	rm -f bin/* test/list.so
 
-.PHONY: build clean
+test:
+	gcc -shared -o test/list.so -fPIC src/list.c
+	cd test;\
+	python3 list.py
+
+.PHONY: build clean test
 
 ##################################################
 
-bin/provol-comp: bin/grammar.tab.c bin/lex.yy.c
+# creates bin directory if it does not exist
+bin:
+	mkdir -p bin
+
+bin/provol-comp: bin/grammar.tab.c bin/lex.yy.c bin/list.o
 	gcc -Wall $^ -o $@
 
 bin/grammar.tab.c: src/grammar.y
@@ -16,3 +25,5 @@ bin/grammar.tab.c: src/grammar.y
 bin/lex.yy.c: src/lex.l
 	lex -o $@ $<
 
+bin/list.o: src/list.c
+	gcc -Wall $< -c -o $@

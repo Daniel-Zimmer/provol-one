@@ -1,8 +1,10 @@
 %{
 	#include "grammar.tab.h"
+	#include "../src/list.h"
 
 	int indent_depth = 1;
 
+	extern List *varList;
 %}
 
 %option noyywrap
@@ -25,6 +27,17 @@
 
 [a-zA-Z_][a-zA-Z_0-9]* {
 	yylval.s = strdup(yytext);
+
+	for (int i = 0; i < LIST_len(varList); i++) {
+		if (!strcmp(LIST_get(varList, i), yytext)) {
+			goto no_push;
+		}
+	}
+
+	varList = LIST_push(varList, strdup(yytext));
+
+	no_push:
+
 	return TK_ID;
 }
 
