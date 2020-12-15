@@ -1,7 +1,7 @@
 build: bin bin/provol-comp provol-one
 
 clean:
-	rm -rf bin test/list.so provol-one
+	rm -rf bin test/list.so provol-one example/ex1 example/ex1.c example/ex1.h
 
 test:
 	gcc -shared -o test/list.so -fPIC src/list.c
