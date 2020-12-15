@@ -21,6 +21,8 @@
 "SAIDA"    { return TK_SAIDA   ; }
 "FIM"      { indent_depth--; return TK_FIM      ; }
 "ENQUANTO" { indent_depth++; return TK_ENQUANTO ; }
+"SE"       { indent_depth++; return TK_SE       ; }
+"ENTAO"    { return TK_ENTAO   ; }
 "FACA"     { return TK_FACA    ; }
 "INC"      { return TK_INC     ; }
 "ZERA"     { return TK_ZERA    ; }
@@ -39,6 +41,12 @@
 	no_push:
 
 	return TK_ID;
+}
+
+[0-9]* {
+	yylval.s = strdup(yytext);
+
+	return TK_INT;
 }
 
 . {

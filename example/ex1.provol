@@ -1,9 +1,18 @@
 ENTRADA ent1, ent2
-SAIDA sai1
+SAIDA sai
 
 	ENQUANTO ent1 FACA
 		INC(ent2)
 	FIM
 
-	sai1 = ent2
+	sai = ent2
+
+	ZERA(var1)
+
+	SE var1 ENTAO
+		ZERA(sai)
+	FIM
+
+	sai = 13
+
 FIM

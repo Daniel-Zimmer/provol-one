@@ -27,6 +27,9 @@
 %token TK_FACA
 %token TK_INC
 %token TK_ZERA
+%token TK_SE
+%token TK_ENTAO
+%token <s> TK_INT
 %token <s> TK_ID
 
 %type <s> varlist cmd cmds cmds_opt
@@ -169,11 +172,66 @@ cmds_opt:
 
 		free($1);
 	}
-	| { $$ = malloc(1); $$[0] = '\0'; }
-;
-
 cmd:
-	TK_ENQUANTO TK_ID TK_FACA nl cmds_opt TK_FIM {
+	TK_ID '=' TK_INT {
+		char tabs[indent_depth + 1];
+		makeTabs(tabs, indent_depth);
+		char sep[] = " = ";
+		char end[] = ";";
+
+		size_t len =
+			indent_depth +
+			strlen($1) +
+			sizeof(sep) +
+			sizeof($3) +
+			sizeof(end) +
+			1;
+
+		$$ = malloc(len);
+
+		strcpy($$, tabs);
+		strcat($$, $1);
+		strcat($$, sep);
+		strcat($$, $3);
+		strcat($$, end);
+
+		free($1);
+		free($3);
+	}
+
+	| TK_SE TK_ID TK_ENTAO nl cmds_opt TK_FIM {
+		char tabs[indent_depth + 1];
+		makeTabs(tabs, indent_depth);
+		char _if[] = "if (";
+		char open_bracket[] = ") {\n";
+		char close_bracket[] = "}\n";
+
+		size_t len =
+			indent_depth +
+			sizeof(_if) +
+			strlen($2) +
+			sizeof(open_bracket) +
+			strlen($5) +
+			indent_depth - 1 +
+			sizeof(close_bracket) +
+			1;
+		
+		$$ = malloc(len);
+
+		strcpy($$, tabs);
+		strcat($$, _if);
+		strcat($$, $2);
+		strcat($$, open_bracket);
+		strcat($$, $5);
+		tabs[indent_depth] = '\0';
+		strcat($$, tabs);
+		strcat($$, close_bracket);
+
+		free($2);
+		free($5);
+	}
+
+	| TK_ENQUANTO TK_ID TK_FACA nl cmds_opt TK_FIM {
 		char tabs[indent_depth + 1];
 		makeTabs(tabs, indent_depth);
 		char _while[] = "while (";
