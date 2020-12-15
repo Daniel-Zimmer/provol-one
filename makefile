@@ -1,7 +1,7 @@
-build: bin bin/provol-comp
+build: bin bin/provol-comp provol-one
 
 clean:
-	rm -f bin/* test/list.so
+	rm -rf bin test/list.so provol-one
 
 test:
 	gcc -shared -o test/list.so -fPIC src/list.c
@@ -27,3 +27,6 @@ bin/lex.yy.c: src/lex.l
 
 bin/list.o: src/list.c
 	gcc -Wall $< -c -o $@
+
+provol-one: src/provol-one
+	cp $< $@

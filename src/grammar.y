@@ -59,7 +59,7 @@ program:
 
 
 		printf(
-			"unsigned int func(%s) {\n"
+			"unsigned int provol_func(%s) {\n"
 			"\tunsigned int "
 			, $2
 		);

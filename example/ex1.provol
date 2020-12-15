@@ -1,0 +1,9 @@
+ENTRADA ent1, ent2
+SAIDA sai1
+
+	ENQUANTO ent1 FACA
+		INC(ent2)
+	FIM
+
+	sai1 = ent2
+FIM
